@@ -1,0 +1,480 @@
+{
+  "name": "gmail ai assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "👋 Welcome!\n\nI'm your AI Gmail Assistant.\n\nI can help you:\n\n• Read your latest email\n• Send emails\n• Reply to emails\n• Archive emails\n• Delete emails\n• Mark emails as read or unread\n• Star or unstar emails\n\nHow can I help you today?",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -176,
+        -304
+      ],
+      "id": "d7aca214-b420-4683-8215-01d3302e7c51",
+      "name": "When chat message received",
+      "webhookId": "a8fbada0-28a0-4e6b-8a29-306f139fd397"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are an AI Gmail Assistant.\n\nYour job is to help users manage Gmail naturally.\n\nCapabilities:\n- Read emails\n- Send emails\n- Reply to emails\n- Archive emails\n- Delete emails\n- Mark emails as read/unread\n- Star/unstar emails\n\nRules:\n1. Understand natural language.\n2. If a required detail is missing, ask only for that detail.\n3. Never invent email content.\n4. Never claim an action succeeded unless the tool confirms it.\n5. If a tool fails, apologize briefly and ask the user to try again.\n6. Never expose internal workflow details.\n7. Be concise and professional.\n8. Confirm completed actions in one short sentence.\n9. If the request is outside Gmail management, politely state that you only assist with Gmail.\n10. After completing an action, always respond with a short, natural confirmation.\n\nExamples:\n- \"Your email has been sent.\"\n- \"Your reply has been sent.\"\n- \"The email has been archived.\"\n- \"The email has been deleted.\"\n- \"The email has been marked as read.\"\n- \"The email has been marked as unread.\"\n- \"The email has been starred.\"\n- \"The email has been unstarred.\"\n\nDo not mention tools, workflows, APIs, or implementation details."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        352,
+        -368
+      ],
+      "id": "13463a15-aeee-42bc-9209-ed0cbdf15de8",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Get many messages in Gmail Use this tool first to find the latest unread email. It returns the Message ID that must be used by the Get Message tool.",
+        "operation": "getAll",
+        "limit": "=1",
+        "simple": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Simplify', `Search Gmail for emails based on the user's request.\nGenerate a valid Gmail search query.\n\nExamples:\n- latest unread email → is:unread\n- latest email → newer_than:7d\n- today's emails → newer_than:1d\n- emails from Amazon → from:amazon.com\n- interview emails → interview\n- emails with attachments → has:attachment\n\nReturn only the Gmail search query.`, 'boolean') }}",
+        "filters": {
+          "q": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Search', `Search Gmail based on the user's request.\n\nGenerate a valid Gmail search query using Gmail search operators.\n\nExamples:\n- latest email → newer_than:1d\n- unread emails → is:unread\n- emails from John → from:john@example.com\n- emails about invoice → invoice\n- starred emails → is:starred\n\nOnly generate the search query. Do not generate explanations or extra text.`, 'string') }}"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        352,
+        0
+      ],
+      "id": "2c73e0c6-f096-43e1-824a-429763092783",
+      "name": "read email",
+      "webhookId": "21a57c40-b67a-449f-8835-17db633dda26",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Q7k6231vJt4LdM70",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', `Enter the recipient email address.\n\nThe user may provide one or more recipient email addresses.\n\nExamples:\njohn@gmail.com\nsupport@company.com\nhr@google.com\nmanager@company.com`, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', `Write a short, clear, and professional email subject based on the user's request.\n\nExamples:\nMeeting Tomorrow\nProject Update\nLeave Request\nInvoice Request\nJob Application\nFollow-up Regarding Interview`, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', `Write a professional email body based on the user's request.\n\nInclude:\n- A polite greeting\n- The main purpose of the email\n- A professional closing\n\nExample:\n\nDear Sir/Madam,\n\nI hope you are doing well.\n\nI am writing regarding...\n\nThank you for your time and consideration.\n\nBest regards,\nKunal`, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        640,
+        0
+      ],
+      "id": "e6b75986-68ee-4a21-95e7-23dd63b275d7",
+      "name": "send email",
+      "webhookId": "21a57c40-b67a-449f-8835-17db633dda26",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Q7k6231vJt4LdM70",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Reply to a message in Gmail",
+        "operation": "reply",
+        "messageId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message_ID', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', `Reply to an existing Gmail message. Always use the Message ID returned by the Read Email tool.`, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        512,
+        96
+      ],
+      "id": "f1bb2bb0-5a56-4e7f-8a2e-8213ddbd838d",
+      "name": "reply email",
+      "webhookId": "21a57c40-b67a-449f-8835-17db633dda26",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Q7k6231vJt4LdM70",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Delete a message in Gmail",
+        "operation": "delete",
+        "messageId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message_ID', `Use the Message ID of the email to delete.\n\nOnly use this parameter after the user has explicitly confirmed deletion.\nNever delete an email without confirmation.`, 'string') }}"
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        1136,
+        -400
+      ],
+      "id": "57542e5c-9c91-4920-950f-16a7ba61f8ca",
+      "name": "delete email",
+      "webhookId": "21a57c40-b67a-449f-8835-17db633dda26",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Q7k6231vJt4LdM70",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Get a message in Gmai Use this tool only after using the Read Email tool. Pass the id returned by Read Email as the Message ID. This tool retrieves the complete email body and full content.",
+        "operation": "get",
+        "messageId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message_ID', ``, 'string') }}",
+        "simple": false,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        192,
+        -16
+      ],
+      "id": "7123276c-c223-4fa1-892a-555a86a77cc5",
+      "name": "Get a message in Gmail",
+      "webhookId": "220d21a6-d98a-420b-8946-ac39b5053ab7",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Q7k6231vJt4LdM70",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        32,
+        -16
+      ],
+      "id": "39fd48df-5561-45a7-8202-d7c7e000dc49",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -128,
+        -64
+      ],
+      "id": "6df28f32-7516-4744-9db4-79734114a046",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Z7PEyS3I8QgUQ0fz",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Remove label from message in Gmail",
+        "operation": "removeLabels",
+        "messageId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message_ID', `Use the Message ID of the email to delete.\n\nOnly use this parameter after the user has explicitly confirmed deletion.\nNever delete an email without confirmation.`, 'string') }}",
+        "labelIds": [
+          "INBOX"
+        ]
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        1184,
+        -208
+      ],
+      "id": "f80f5cb1-963a-4d72-97da-76ebd254ac2b",
+      "name": "Archive email",
+      "webhookId": "21a57c40-b67a-449f-8835-17db633dda26",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Q7k6231vJt4LdM70",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Mark a message as read in Gmail",
+        "operation": "markAsRead",
+        "messageId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message_ID', `Use the Message ID of the email to delete.\n\nOnly use this parameter after the user has explicitly confirmed deletion.\nNever delete an email without confirmation.`, 'string') }}"
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        960,
+        48
+      ],
+      "id": "65c929d9-3373-4ce1-b5b4-803052191781",
+      "name": "mark as read",
+      "webhookId": "21a57c40-b67a-449f-8835-17db633dda26",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Q7k6231vJt4LdM70",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Mark a message as unread in Gmail",
+        "operation": "markAsUnread",
+        "messageId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message_ID', `Use the Message ID of the email to delete.\n\nOnly use this parameter after the user has explicitly confirmed deletion.\nNever delete an email without confirmation.`, 'string') }}"
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        816,
+        16
+      ],
+      "id": "c5dea197-939e-4949-a489-5f3f8a4d07ed",
+      "name": "mark as unread",
+      "webhookId": "21a57c40-b67a-449f-8835-17db633dda26",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Q7k6231vJt4LdM70",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Add label to message in Gmail",
+        "operation": "addLabels",
+        "messageId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message_ID', `Use the Message ID of the email to delete.\n\nOnly use this parameter after the user has explicitly confirmed deletion.\nNever delete an email without confirmation.`, 'string') }}",
+        "labelIds": [
+          "STARRED"
+        ]
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        1472,
+        32
+      ],
+      "id": "46644422-5f1e-4dfc-9092-0f872568d8af",
+      "name": "Star email",
+      "webhookId": "21a57c40-b67a-449f-8835-17db633dda26",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Q7k6231vJt4LdM70",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Remove label from message in Gmail",
+        "operation": "removeLabels",
+        "messageId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message_ID', `Use the Message ID of the email to delete.\n\nOnly use this parameter after the user has explicitly confirmed deletion.\nNever delete an email without confirmation.`, 'string') }}",
+        "labelIds": [
+          "STARRED"
+        ]
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        1616,
+        -208
+      ],
+      "id": "cded50b5-b566-49e3-b02a-022861704e25",
+      "name": "unstar email",
+      "webhookId": "21a57c40-b67a-449f-8835-17db633dda26",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Q7k6231vJt4LdM70",
+          "name": "Gmail account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "read email": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "send email": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "reply email": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "delete email": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Archive email": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "mark as read": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "mark as unread": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Star email": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "unstar email": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "c1178489-85a8-4a52-a124-ea5a905002fc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7f6f8d347ba637c87fa8f7df217d17592811c78983f59f56bea96913478e5fe3"
+  },
+  "nodeGroups": [],
+  "id": "1EnuI3IAxrI0pXq6",
+  "tags": []
+}
