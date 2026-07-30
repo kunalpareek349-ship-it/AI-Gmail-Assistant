@@ -1,4 +1,9 @@
 # 📧 AI Gmail Assistant
+![n8n](https://img.shields.io/badge/Built%20with-n8n-orange)
+![Google Gemini](https://img.shields.io/badge/AI-Google%20Gemini-blue)
+![Gmail API](https://img.shields.io/badge/API-Gmail-red)
+![License](https://img.shields.io/badge/License-MIT-green)
+![Status](https://img.shields.io/badge/Status-Working-success)
 
 An AI-powered Gmail Assistant built with **n8n**, **Google Gemini**, and the **Gmail API**. The assistant understands natural language and performs Gmail operations such as reading, sending, replying, archiving, deleting, starring, and marking emails as read or unread.
 
