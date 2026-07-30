@@ -23,6 +23,9 @@ An AI-powered Gmail Assistant built with **n8n**, **Google Gemini**, and the **G
 - ✩ Unstar emails
 - 🤖 Natural language interaction
 - 🧠 AI-powered tool selection
+- ## Workflow
+
+![AI Gmail Assistant Workflow](Screenshot%20(588).png)
 
 ---
 
